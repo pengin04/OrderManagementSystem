@@ -1,0 +1,59 @@
+/* 背景と全体レイアウト */
+body {
+  background-color: #f8f9fa;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* タイトル */
+h1 {
+  margin-top: 50px;
+  color: #333;
+}
+
+/* フォーム全体 */
+form {
+  background-color: #ffffff;
+  padding: 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 350px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+/* 入力フィールド */
+input[type="text"] {
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  transition: border-color 0.3s;
+}
+
+input[type="text"]:focus {
+  border-color: #007BFF;
+  outline: none;
+}
+
+/* 登録ボタン */
+button[type="submit"] {
+  padding: 12px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button[type="submit"]:hover {
+  background-color: #218838;
+}

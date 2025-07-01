@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>注文履歴</title>
+    <link rel="stylesheet" href="css/order.css">
+</head>
+<body>
+    <div class="container">
+        <h1>注文履歴</h1>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>注文ID</th>
+                    <th>顧客名</th> <!-- 追加 -->
+                    <th>携帯番号</th> <!-- 追加 -->
+                    <th>商品詳細</th>
+                    <th>合計金額</th>
+                    <th>受け取り時間</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="order : ${orders}">
+                    <td th:text="${order.order_id}">1</td>
+                    <td th:text="${order.customer_name}">山田太郎</td> <!-- 追加 -->
+                    <td th:text="${order.phone_number}">090-1234-5678</td> <!-- 追加 -->
+                    <td th:text="${order.item_details}">コーヒー×2, パン×1</td>
+                    <td>¥<span th:text="${order.total_price}">500</span></td>
+                    <td th:text="${#temporals.format(order.pickup_time, 'yyyy-MM-dd HH:mm')}">2025-05-15 12:00</td>
+                </tr>
+            </tbody>
+        </table>
+
+        
+    </div>
+    <div class="center-button">
+    <a href="/home" class="button">ホームに戻る</a>
+</div>
+</body>
+</html>

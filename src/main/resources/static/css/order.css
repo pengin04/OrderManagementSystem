@@ -1,0 +1,157 @@
+/* 全体コンテナのスタイル */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #fff;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #fff5f0;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+}
+
+h1 {
+    text-align: center;
+    color: #b30000;
+    margin-bottom: 30px;
+}
+
+/* フォームスタイル */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+    margin-bottom: 40px;
+}
+
+label {
+    font-weight: bold;
+}
+
+input[type="number"],
+select {
+    padding: 5px 10px;
+    font-size: 16px;
+    width: 120px;
+}
+
+input[type="submit"] {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #cc0000;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background-color: #990000;
+}
+
+/* 商品リスト全体 */
+.recommendation {
+    margin-top: 30px;
+}
+
+.recommendation h2 {
+    background-color: #a00;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* 商品のグリッドレイアウト */
+.items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* 個々の商品カード */
+.items {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4列に分割 */
+    gap: 20px; /* アイテム間のスペース */
+    margin-top: 20px;
+}
+
+.item {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    background-color: #f9f9f9;
+}
+
+.item-title {
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.item-price {
+    color: #555;
+    margin-bottom: 8px;
+}
+
+@media screen and (max-width: 768px) {
+    .items {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .items {
+        grid-template-columns: 1fr;
+    }
+}
+.quantity-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px; /* ラベルと入力欄の隙間 */
+    margin-top: 10px;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background-color: #007BFF;
+  border: none;
+  color: white;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.center-button {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.center-button .button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #cc0000;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+.center-button .button:hover {
+    background-color: #990000;
+}
+
+
