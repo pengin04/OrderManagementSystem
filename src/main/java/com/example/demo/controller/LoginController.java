@@ -85,42 +85,49 @@ public class LoginController {
     }
     
     @PostMapping("/register")
-    public String registerProduct(@RequestParam("productName") String name,
-                                  @RequestParam("price") BigDecimal price,
-                                  @RequestParam("storeName") String storeName,
-                                  @RequestParam("imageFile") MultipartFile imageFile,
-                                  Model model) {
-        try {
-            // 保存先ディレクトリ（統一）
-            String uploadDir = "C:/uploaded-image/";
-            File uploadDirFile = new File(uploadDir);
-            if (!uploadDirFile.exists()) {
-                uploadDirFile.mkdirs();
-            }
+public String registerProduct(@RequestParam("productName") String name,
+                              @RequestParam("price") BigDecimal price,
+                              @RequestParam("storeName") String storeName,
+                              @RequestParam("imageFile") MultipartFile imageFile,
+                              Model model) {
+    try {
+        // ① S3 にアップロード
+        String fileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
+        String key      = "products/" + fileName;   // バケット内パス
 
-            // ファイル名
-            String fileName = imageFile.getOriginalFilename();
-            File dest = new File(uploadDir + fileName);
-            imageFile.transferTo(dest);
+        PutObjectRequest putReq = PutObjectRequest.builder()
+                .bucket("product-images")           // バケット名
+                .key(key)
+                .contentType(imageFile.getContentType())
+                .build();
 
-            // 商品エンティティ作成・保存
-            Product product = new Product();
-            product.setProductName(name);
-            product.setPrice(price);
-            product.setImageUrl(fileName);
-            product.setStoreName(storeName);
+        supabaseS3.putObject(
+            putReq,
+            RequestBody.fromInputStream(imageFile.getInputStream(),
+                                        imageFile.getSize()));
 
-            productRepository.save(product);
+        // ② 公開 URL を組み立てて DB に保存
+        String publicUrl = String.format(
+            "https://%s.supabase.co/storage/v1/object/public/product-images/%s",
+            projectRef, key);
 
-            model.addAttribute("message", "商品が正常に登録されました！");
-            return "register_success";
+        Product product = new Product();
+        product.setProductName(name);
+        product.setPrice(price);
+        product.setStoreName(storeName);
+        product.setImageUrl(publicUrl);
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            model.addAttribute("error", "ファイル保存中にエラーが発生しました。");
-            return "form";
-        }
+        productRepository.save(product);
+
+        model.addAttribute("message", "商品が正常に登録されました！");
+        return "register_success";
+
+    } catch (IOException | S3Exception e) {
+        e.printStackTrace();
+        model.addAttribute("error", "画像アップロードに失敗しました。");
+        return "form";
     }
+}
     
     
  // 商品一覧画面（ログイン店舗の商品だけ表示）
