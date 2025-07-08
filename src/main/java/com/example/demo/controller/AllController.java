@@ -25,6 +25,11 @@ public class AllController {
 		return "index";
 	}
 
+	@GetMapping("/order_complete")
+	public String showHome1() {
+		return "order_complete";
+	}
+
 	@PostMapping("/sendMail")
 	public String sendMail(@Validated MailForm mailForm, BindingResult bindingResult) {
 		//バリデーションチェック
