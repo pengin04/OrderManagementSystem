@@ -1,25 +1,22 @@
 package com.example.demo.controller;
+
 import java.util.UUID;
-import org.springframework.beans.factory.annotation.Value;
-
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.services.s3.model.S3Exception;
-
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
 import com.example.demo.entity.OrderManagement;
 import com.example.demo.entity.Product;
@@ -42,11 +39,20 @@ public class LoginController {
 
     @Autowired
     private ProductRepository productRepository;
-    
+
     @Autowired
     private StoreRepository storeRepository;
 
- // ログイン処理
+    // ✅ S3 クライアントの注入
+    @Autowired
+    private S3Client supabaseS3;
+
+    // ✅ Supabase プロジェクト参照の読み込み
+    @Value("${supabase.project-ref}")
+    private String projectRef;
+
+    // ...以下、他のメソッドは変更なし...
+// ログイン処理
     @PostMapping("/login")
     public String login(@RequestParam String storeName, @RequestParam String password, HttpSession session) {
         boolean success = loginService.login(storeName, password);
@@ -243,5 +249,4 @@ public String registerProduct(@RequestParam("productName") String name,
         session.invalidate(); 
         return "redirect:/login"; 
     }
-    
 }
