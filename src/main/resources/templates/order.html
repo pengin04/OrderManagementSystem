@@ -16,7 +16,7 @@
 
                     <th:block th:each="product : ${products}">
                         <div class="item">
-                           <img th:src="@{/uploaded-image/{filename}(filename=${product.imageUrl})}" 
+                           <img th:src="${product.imageUrl}" 
      th:alt="${product.productName}" 
      width="100" 
      height="100">
