@@ -25,7 +25,7 @@ public class AllController {
 		return "index";
 	}
 
-	@GetMapping("/order_complete")
+	@PostMapping("/order_complete")
 	public String showHome1() {
 		return "order_complete";
 	}
