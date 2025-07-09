@@ -1,8 +1,8 @@
 package com.example.demo.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.beans.factory.annotation.Value;
 
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentials;
@@ -33,13 +33,12 @@ public class SupabaseStorageConfig {
         AwsCredentials creds = AwsBasicCredentials.create(accessKey, secretKey);
 
         return S3Client.builder()
-                .endpointOverride(URI.create(
-                        "https://" + projectRef + ".supabase.co/storage/v1/s3"))
+                .endpointOverride(URI.create("https://" + projectRef + ".supabase.co/storage/v1")) // ★ここを確認
                 .credentialsProvider(StaticCredentialsProvider.create(creds))
                 .region(Region.of(region))
                 .serviceConfiguration(
                         S3Configuration.builder()
-                                .pathStyleAccessEnabled(true)
+                                .pathStyleAccessEnabled(true) // ★これを忘れずに！
                                 .build())
                 .build();
     }
