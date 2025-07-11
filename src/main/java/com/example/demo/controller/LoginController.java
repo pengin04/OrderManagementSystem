@@ -99,6 +99,7 @@ private String secretKey;
                                   @RequestParam("storeName") String storeName,
                                   @RequestParam("imageFile") MultipartFile imageFile,
                                   Model model) {
+        System.out.println("エラー");
         try {
             String fileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
             String objectPath = "products/" + fileName;
