@@ -1,10 +1,17 @@
 package com.example.demo.controller;
 
-import java.util.UUID;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
+
+import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.io.entity.InputStreamEntity;
+import org.apache.hc.core5.http.ContentType;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,11 +19,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.services.s3.model.S3Exception;
 
 import com.example.demo.entity.OrderManagement;
 import com.example.demo.entity.Product;
@@ -43,40 +45,36 @@ public class LoginController {
     @Autowired
     private StoreRepository storeRepository;
 
-    // ✅ S3 クライアントの注入
-    @Autowired
-    private S3Client supabaseS3;
-
-    // ✅ Supabase プロジェクト参照の読み込み
     @Value("${supabase.project-ref}")
     private String projectRef;
 
-    // ...以下、他のメソッドは変更なし...
-// ログイン処理
+    @Value("${supabase.bucket}")
+    private String bucket;
+
+    @Value("${supabase.secret}")
+    private String secretKey;
+
     @PostMapping("/login")
     public String login(@RequestParam String storeName, @RequestParam String password, HttpSession session) {
         boolean success = loginService.login(storeName, password);
         if (success) {
-            session.setAttribute("storeName", storeName); // 店舗名をセッションに保存
+            session.setAttribute("storeName", storeName);
             return "redirect:/home";
         } else {
             return "login-failure";
         }
     }
 
-    // ログインフォーム表示
     @GetMapping("/login")
     public String showLoginForm() {
         return "login";
     }
 
-    // ホーム画面
     @GetMapping("/home")
     public String home() {
         return "home";
     }
 
-    // 注文リスト表示
     @GetMapping("/orderlist")
     public String showOrderList(Model model) {
         List<OrderManagement> orders = orderRepository.findAll();
@@ -84,88 +82,73 @@ public class LoginController {
         return "orderlist";
     }
 
-    // 商品登録フォーム表示
     @GetMapping("/form")
     public String showProductForm(Model model, HttpSession session) {
         model.addAttribute("product", new Product());
-
         String storeName = (String) session.getAttribute("storeName");
         if (storeName == null) {
             return "redirect:/login";
         }
-        model.addAttribute("storeName", storeName); // 画面に店舗名を渡す
+        model.addAttribute("storeName", storeName);
         return "form";
     }
-    
+
     @PostMapping("/register")
-public String registerProduct(@RequestParam("productName") String name,
-                              @RequestParam("price") BigDecimal price,
-                              @RequestParam("storeName") String storeName,
-                              @RequestParam("imageFile") MultipartFile imageFile,
-                              Model model) {
-    try {
-        // ファイル名生成
-        String fileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
-        String objectPath = "products/" + fileName;
-        String uploadUrl = String.format("https://%s.supabase.co/storage/v1/object/%s/%s",
-                                         projectRef, bucket, objectPath);
+    public String registerProduct(@RequestParam("productName") String name,
+                                  @RequestParam("price") BigDecimal price,
+                                  @RequestParam("storeName") String storeName,
+                                  @RequestParam("imageFile") MultipartFile imageFile,
+                                  Model model) {
+        try {
+            String fileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
+            String objectPath = "products/" + fileName;
+            String uploadUrl = String.format("https://%s.supabase.co/storage/v1/object/%s/%s", projectRef, bucket, objectPath);
 
-        // Supabase REST API を使って PUT アップロード
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpPut put = new HttpPut(uploadUrl);
-            put.setHeader("Authorization", "Bearer " + secretKey);
-            put.setHeader("Content-Type", imageFile.getContentType());
+            try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+                HttpPut put = new HttpPut(uploadUrl);
+                put.setHeader("Authorization", "Bearer " + secretKey);
+                put.setHeader("Content-Type", imageFile.getContentType());
 
-            InputStreamEntity entity = new InputStreamEntity(
-                imageFile.getInputStream(),
-                imageFile.getSize(),
-                ContentType.parse(imageFile.getContentType())
-            );
-            put.setEntity(entity);
+                InputStreamEntity entity = new InputStreamEntity(
+                    imageFile.getInputStream(),
+                    imageFile.getSize(),
+                    ContentType.parse(imageFile.getContentType())
+                );
+                put.setEntity(entity);
 
-            var response = httpClient.execute(put);
-            int statusCode = response.getCode();
-            if (statusCode != 200 && statusCode != 201) {
-                model.addAttribute("error", "Supabaseアップロード失敗: " + statusCode);
-                return "form";
+                var response = httpClient.execute(put);
+                int statusCode = response.getCode();
+                if (statusCode != 200 && statusCode != 201) {
+                    model.addAttribute("error", "Supabaseアップロード失敗: " + statusCode);
+                    return "form";
+                }
             }
+
+            String publicUrl = String.format("https://%s.supabase.co/storage/v1/object/public/%s/%s",
+                                             projectRef, bucket, objectPath);
+
+            Product product = new Product();
+            product.setProductName(name);
+            product.setPrice(price);
+            product.setStoreName(storeName);
+            product.setImageUrl(publicUrl);
+
+            productRepository.save(product);
+            model.addAttribute("message", "商品が正常に登録されました！");
+            return "register_success";
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            model.addAttribute("error", "画像アップロードに失敗しました: " + e.getMessage());
+            return "form";
         }
-
-        // 公開URLの構築
-        String publicUrl = String.format("https://%s.supabase.co/storage/v1/object/public/%s/%s",
-                                         projectRef, bucket, objectPath);
-
-        // DB保存
-        Product product = new Product();
-        product.setProductName(name);
-        product.setPrice(price);
-        product.setStoreName(storeName);
-        product.setImageUrl(publicUrl);
-
-        productRepository.save(product);
-        model.addAttribute("message", "商品が正常に登録されました！");
-        return "register_success";
-
-    } catch (Exception e) {
-        e.printStackTrace();
-        model.addAttribute("error", "画像アップロードに失敗しました: " + e.getMessage());
-        return "form";
     }
-}
 
-}
-    
-    
- // 商品一覧画面（ログイン店舗の商品だけ表示）
     @GetMapping("/productlist")
     public String showProductList(Model model, HttpSession session) {
-        String storeName = (String) session.getAttribute("storeName"); // セッションから店舗名取得
-
-        if (storeName == null) {
-            return "redirect:/login"; // 未ログインならログイン画面へ
-        }
-
-        List<Product> productList = productRepository.findByStoreName(storeName); // 店舗名で絞る
+        String storeName = (String) session.getAttribute("storeName");
+        if (storeName == null) return "redirect:/login";
+        List<Product> productList = productRepository.findByStoreName(storeName);
         model.addAttribute("productList", productList);
         return "productlist";
     }
@@ -173,9 +156,7 @@ public String registerProduct(@RequestParam("productName") String name,
     @GetMapping("/product/edit")
     public String showEditForm(@RequestParam("id") int id, Model model) {
         Product product = productRepository.findById(id).orElse(null);
-        if (product == null) {
-            return "redirect:/productlist"; // 商品がなければリストへ
-        }
+        if (product == null) return "redirect:/productlist";
         model.addAttribute("product", product);
         return "productedit";
     }
@@ -189,24 +170,20 @@ public String registerProduct(@RequestParam("productName") String name,
                                 @RequestParam("imageFile") MultipartFile imageFile) {
         try {
             Product product = productRepository.findById(id).orElse(null);
-            if (product == null) {
-                return "redirect:/productlist";
-            }
+            if (product == null) return "redirect:/productlist";
 
             product.setProductName(productName);
             product.setPrice(price);
             product.setStoreName(storeName);
 
             if (!imageFile.isEmpty()) {
-                // 新しい画像を保存
                 String uploadDir = "C:/uploaded-image/";
                 String fileName = imageFile.getOriginalFilename();
                 File dest = new File(uploadDir + fileName);
                 imageFile.transferTo(dest);
-
-                product.setImageUrl(fileName); // 新しいファイル名を保存
+                product.setImageUrl(fileName);
             } else {
-                product.setImageUrl(oldImageUrl); // 画像変更なしの場合、元のまま
+                product.setImageUrl(oldImageUrl);
             }
 
             productRepository.save(product);
@@ -217,49 +194,34 @@ public String registerProduct(@RequestParam("productName") String name,
             return "productedit";
         }
     }
-    
-    
-    
+
     @PostMapping("/product/delete")
     public String deleteProduct(@RequestParam("id") int id, HttpSession session) {
-        // セッションから店舗名取得
         String storeName = (String) session.getAttribute("storeName");
-        if (storeName == null) {
-            return "redirect:/login"; // 未ログインならログイン画面へ
-        }
-        
-        // 商品取得
+        if (storeName == null) return "redirect:/login";
         Product product = productRepository.findById(id).orElse(null);
-        if (product != null) {
-            // 削除しようとしている商品がログイン中の店舗の商品か確認（セキュリティ対策）
-            if (storeName.equals(product.getStoreName())) {
-                productRepository.delete(product);
-            }
+        if (product != null && storeName.equals(product.getStoreName())) {
+            productRepository.delete(product);
         }
-        
-        // 削除後は商品一覧画面へリダイレクト
         return "redirect:/productlist";
     }
-    
- // 店舗登録フォームの表示
+
     @GetMapping("/storeregistration")
     public String showStoreRegistrationForm(Model model) {
         model.addAttribute("store", new Store());
         return "storeregistration";
     }
 
-    // 店舗登録処理
     @PostMapping("/storeregister")
     public String registerStore(@ModelAttribute Store store, Model model) {
         storeRepository.save(store);
         model.addAttribute("message", "店舗を登録しました！");
-        return "login"; // 登録後はログインページへ遷移（任意で変更可）
+        return "login";
     }
-  
- // ログアウト
+
     @GetMapping("/logout")
     public String logout(HttpSession session) {
-        session.invalidate(); 
-        return "redirect:/login"; 
+        session.invalidate();
+        return "redirect:/login";
     }
 }
