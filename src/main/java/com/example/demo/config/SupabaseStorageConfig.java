@@ -25,8 +25,8 @@ public class SupabaseStorageConfig {
     @Value("${supabase.access-key}")
     private String accessKey;
 
-    @Value("${supabase.secret-key}")
-    private String secretKey;
+   @Value("${supabase.secret-key}")  // ← これに合わせる
+private String secretKey;
 
     @Bean
     public S3Client supabaseS3() {
