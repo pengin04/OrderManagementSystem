@@ -142,7 +142,7 @@ private String secretKey;
             e.printStackTrace();
             System.out.println("エラー");
             model.addAttribute("error", "画像アップロードに失敗しました: " + e.getMessage());
-            return "form";
+            return "home";
         }
     }
 
