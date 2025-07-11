@@ -104,26 +104,38 @@ public String registerProduct(@RequestParam("productName") String name,
                               @RequestParam("imageFile") MultipartFile imageFile,
                               Model model) {
     try {
-        // ① S3 にアップロード
+        // ファイル名生成
         String fileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
-        String key      = "products/" + fileName;   // バケット内パス
+        String objectPath = "products/" + fileName;
+        String uploadUrl = String.format("https://%s.supabase.co/storage/v1/object/%s/%s",
+                                         projectRef, bucket, objectPath);
 
-        PutObjectRequest putReq = PutObjectRequest.builder()
-                .bucket("product-images")           // バケット名
-                .key(key)
-                .contentType(imageFile.getContentType())
-                .build();
+        // Supabase REST API を使って PUT アップロード
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpPut put = new HttpPut(uploadUrl);
+            put.setHeader("Authorization", "Bearer " + secretKey);
+            put.setHeader("Content-Type", imageFile.getContentType());
 
-        supabaseS3.putObject(
-            putReq,
-            RequestBody.fromInputStream(imageFile.getInputStream(),
-                                        imageFile.getSize()));
+            InputStreamEntity entity = new InputStreamEntity(
+                imageFile.getInputStream(),
+                imageFile.getSize(),
+                ContentType.parse(imageFile.getContentType())
+            );
+            put.setEntity(entity);
 
-        // ② 公開 URL を組み立てて DB に保存
-        String publicUrl = String.format(
-            "https://%s.supabase.co/storage/v1/object/public/product-images/%s",
-            projectRef, key);
+            var response = httpClient.execute(put);
+            int statusCode = response.getCode();
+            if (statusCode != 200 && statusCode != 201) {
+                model.addAttribute("error", "Supabaseアップロード失敗: " + statusCode);
+                return "form";
+            }
+        }
 
+        // 公開URLの構築
+        String publicUrl = String.format("https://%s.supabase.co/storage/v1/object/public/%s/%s",
+                                         projectRef, bucket, objectPath);
+
+        // DB保存
         Product product = new Product();
         product.setProductName(name);
         product.setPrice(price);
@@ -131,15 +143,16 @@ public String registerProduct(@RequestParam("productName") String name,
         product.setImageUrl(publicUrl);
 
         productRepository.save(product);
-
         model.addAttribute("message", "商品が正常に登録されました！");
         return "register_success";
 
-    } catch (IOException | S3Exception e) {
+    } catch (Exception e) {
         e.printStackTrace();
-        model.addAttribute("error", "画像アップロードに失敗しました。");
+        model.addAttribute("error", "画像アップロードに失敗しました: " + e.getMessage());
         return "form";
     }
+}
+
 }
     
     
