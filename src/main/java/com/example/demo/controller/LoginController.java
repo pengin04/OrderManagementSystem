@@ -94,57 +94,66 @@ private String secretKey;
     }
 
     @PostMapping("/register")
-    public String registerProduct(@RequestParam("productName") String name,
-                                  @RequestParam("price") BigDecimal price,
-                                  @RequestParam("storeName") String storeName,
-                                  @RequestParam("imageFile") MultipartFile imageFile,
-                                  Model model) {
-        System.out.println("エラー");
-        try {
-            String fileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
-            String objectPath = "products/" + fileName;
-            String uploadUrl = String.format("https://%s.supabase.co/storage/v1/object/%s/%s", projectRef, bucket, objectPath);
+public String registerProduct(@RequestParam("productName") String name,
+                              @RequestParam("price") BigDecimal price,
+                              @RequestParam("storeName") String storeName,
+                              @RequestParam("imageFile") MultipartFile imageFile,
+                              Model model) {
+    try {
+        // ファイル名をユニークに生成
+        String fileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
+        String objectPath = "products/" + fileName;
 
-            try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-                HttpPut put = new HttpPut(uploadUrl);
-                put.setHeader("Authorization", "Bearer " + secretKey);
-                put.setHeader("Content-Type", imageFile.getContentType());
+        // Supabase Storage REST API アップロードURL
+        String uploadUrl = String.format("https://%s.supabase.co/storage/v1/object/%s/%s",
+                projectRef, bucket, objectPath);
 
-                InputStreamEntity entity = new InputStreamEntity(
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpPut put = new HttpPut(uploadUrl);
+            put.setHeader("Authorization", "Bearer " + secretKey);
+            String contentType = imageFile.getContentType();
+            if (contentType == null || contentType.isBlank()) {
+                contentType = "application/octet-stream"; // fallback
+            }
+            put.setHeader("Content-Type", contentType);
+
+            InputStreamEntity entity = new InputStreamEntity(
                     imageFile.getInputStream(),
                     imageFile.getSize(),
-                    ContentType.parse(imageFile.getContentType())
-                );
-                put.setEntity(entity);
+                    ContentType.parse(contentType)
+            );
+            put.setEntity(entity);
 
-                var response = httpClient.execute(put);
-                int statusCode = response.getCode();
-                if (statusCode != 200 && statusCode != 201) {
-                    model.addAttribute("error", "Supabaseアップロード失敗: " + statusCode);
-                    return "home";
-                }
+            var response = httpClient.execute(put);
+            int statusCode = response.getCode();
+            if (statusCode != 200 && statusCode != 201) {
+                model.addAttribute("error", "Supabaseアップロード失敗: " + statusCode);
+                return "form";
             }
-
-            String publicUrl = String.format("https://%s.supabase.co/storage/v1/object/public/%s/%s",
-                                             projectRef, bucket, objectPath);
-
-            Product product = new Product();
-            product.setProductName(name);
-            product.setPrice(price);
-            product.setStoreName(storeName);
-            product.setImageUrl(publicUrl);
-
-            productRepository.save(product);
-            model.addAttribute("message", "商品が正常に登録されました！");
-            return "register_success";
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("エラー");
-            model.addAttribute("error", "画像アップロードに失敗しました: " + e.getMessage());
-            return "home";
         }
+
+        // 公開URLの生成
+        String publicUrl = String.format("https://%s.supabase.co/storage/v1/object/public/%s/%s",
+                projectRef, bucket, objectPath);
+
+        // DBに商品登録
+        Product product = new Product();
+        product.setProductName(name);
+        product.setPrice(price);
+        product.setStoreName(storeName);
+        product.setImageUrl(publicUrl);
+
+        productRepository.save(product);
+        model.addAttribute("message", "商品が正常に登録されました！");
+        return "register_success";
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        model.addAttribute("error", "画像アップロードに失敗しました: " + e.getMessage());
+        return "form";
     }
+}
+
 
     @GetMapping("/productlist")
     public String showProductList(Model model, HttpSession session) {
