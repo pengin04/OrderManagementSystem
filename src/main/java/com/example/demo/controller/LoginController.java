@@ -51,8 +51,8 @@ public class LoginController {
     @Value("${supabase.bucket}")
     private String bucket;
 
-    @Value("${supabase.secret}")
-    private String secretKey;
+    @Value("${supabase.secret-key}")  // ← これに合わせる
+private String secretKey;
 
     @PostMapping("/login")
     public String login(@RequestParam String storeName, @RequestParam String password, HttpSession session) {
