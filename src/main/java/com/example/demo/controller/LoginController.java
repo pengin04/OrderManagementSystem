@@ -121,7 +121,7 @@ private String secretKey;
                 int statusCode = response.getCode();
                 if (statusCode != 200 && statusCode != 201) {
                     model.addAttribute("error", "Supabaseアップロード失敗: " + statusCode);
-                    return "form";
+                    return "home";
                 }
             }
 
