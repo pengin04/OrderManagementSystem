@@ -139,6 +139,7 @@ private String secretKey;
 
         } catch (Exception e) {
             e.printStackTrace();
+            System.out.println("エラー");
             model.addAttribute("error", "画像アップロードに失敗しました: " + e.getMessage());
             return "form";
         }
