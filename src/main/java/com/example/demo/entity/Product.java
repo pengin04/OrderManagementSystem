@@ -14,27 +14,28 @@ import jakarta.persistence.Table;
 public class Product {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // PostgreSQL でもIDENTITYでOK
+    private Integer id;
 
-    @Column(name = "product_name")
+    @Column(name = "product_name", nullable = false)
     private String productName;
 
+    @Column(precision = 10, scale = 2) // PostgreSQL用に精度指定
     private BigDecimal price;
 
     @Column(name = "image_url")
     private String imageUrl;
 
-    @Column(name = "store_name")
+    @Column(name = "store_name", nullable = false)
     private String storeName;
 
     // --- Getter & Setter ---
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
