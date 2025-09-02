@@ -46,12 +46,12 @@ public class LoginController {
     private StoreRepository storeRepository;
 
     @Value("${supabase.project-ref}")
-    private String projectRef;
+private String projectRef;
 
-    @Value("${supabase.bucket}")
-    private String bucket;
+@Value("${supabase.bucket}")
+private String bucket;
 
-    @Value("${supabase.secret-key}")  // ← これに合わせる
+@Value("${supabase.secret-key}")
 private String secretKey;
 
     @PostMapping("/login")
@@ -94,29 +94,35 @@ private String secretKey;
     }
 
     @PostMapping("/register")
-public String registerProduct(@RequestParam("productName") String name,
-                              @RequestParam("price") BigDecimal price,
-                              @RequestParam("storeName") String storeName,
-                              @RequestParam("imageFile") MultipartFile imageFile,
-                              Model model) {
+public String registerProduct(
+        @RequestParam("productName") String name,
+        @RequestParam("price") BigDecimal price,
+        @RequestParam("storeName") String storeName,
+        @RequestParam("imageFile") MultipartFile imageFile,
+        Model model) {
+
     try {
+        if (imageFile.isEmpty()) {
+            model.addAttribute("error", "画像ファイルが選択されていません");
+            return "form";
+        }
+
         // ファイル名をユニークに生成
         String fileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
         String objectPath = "products/" + fileName;
 
-        // Supabase Storage REST API アップロードURL
+        // Supabase Storage REST API の正しい URL
         String uploadUrl = String.format(
-    "https://%s.supabase.co/storage/v1/object/%s?path=%s",
-    projectRef, bucket, objectPath
-);
-
+                "https://%s.supabase.co/storage/v1/object/%s/%s",
+                projectRef, bucket, objectPath
+        );
 
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPut put = new HttpPut(uploadUrl);
             put.setHeader("Authorization", "Bearer " + secretKey);
             String contentType = imageFile.getContentType();
             if (contentType == null || contentType.isBlank()) {
-                contentType = "application/octet-stream"; // fallback
+                contentType = "application/octet-stream";
             }
             put.setHeader("Content-Type", contentType);
 
@@ -129,17 +135,22 @@ public String registerProduct(@RequestParam("productName") String name,
 
             var response = httpClient.execute(put);
             int statusCode = response.getCode();
+            String body = EntityUtils.toString(response.getEntity());
+            System.out.println("Supabase response: " + statusCode + " " + body);
+
             if (statusCode != 200 && statusCode != 201) {
-                model.addAttribute("error", "Supabaseアップロード失敗: " + statusCode);
+                model.addAttribute("error", "Supabaseアップロード失敗: " + statusCode + " " + body);
                 return "form";
             }
         }
 
-        // 公開URLの生成
-        String publicUrl = String.format("https://%s.supabase.co/storage/v1/object/public/%s/%s",
-                projectRef, bucket, objectPath);
+        // 公開 URL
+        String publicUrl = String.format(
+                "https://%s.supabase.co/storage/v1/object/public/%s/%s",
+                projectRef, bucket, objectPath
+        );
 
-        // DBに商品登録
+        // DB に登録
         Product product = new Product();
         product.setProductName(name);
         product.setPrice(price);
