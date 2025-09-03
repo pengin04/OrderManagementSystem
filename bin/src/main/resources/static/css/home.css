@@ -1,0 +1,32 @@
+
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin-top: 100px;
+    }
+    h1 {
+      font-size: 16px;
+      margin-bottom: 50px;
+    }
+    .button {
+      display: block;
+      width: 200px;
+      margin: 20px auto;
+      padding: 15px 0;
+      border: 1px solid #000;
+      text-decoration: none;
+      color: #000;
+      font-size: 14px;
+    }
+
+    
+    .logout {
+      display: block;
+      width: 200px;
+      margin: 20px auto;
+      padding: 15px 0;
+      border: 1px solid #000;
+      text-decoration: none;
+      color: #000;
+      font-size: 14px;
+    }

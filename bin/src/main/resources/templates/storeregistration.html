@@ -1,0 +1,33 @@
+<!DOCTYPE html> 
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>店舗新規登録</title>
+    <link rel="stylesheet" href="css/storeregister.css">
+</head>
+<body>
+    <main>
+        <form th:action="@{/storeregister}" th:object="${store}" method="post">
+            <h2>店舗新規登録</h2>
+
+            <div>
+                <label>店舗名:</label>
+                <input type="text" th:field="*{storeName}" required />
+            </div>
+
+            <div>
+                <label>パスワード:</label>
+                <input type="password" th:field="*{password}" required />
+            </div>
+
+            <div>
+                <button type="submit">登録</button>
+            </div>
+
+            <a href="/login" class="button">戻る</a>
+        </form>
+
+        <p th:text="${message}"></p>
+    </main>
+</body>
+</html>

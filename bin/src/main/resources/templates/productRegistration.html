@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>新規商品登録</title>
+    <link rel="stylesheet" href="css/productRegistration.css">
+</head>
+<body>
+
+<div class="container">
+    <h2>新規商品登録</h2>
+   <form action="/register-product" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="name">商品名</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="price">値段</label>
+            <input type="number" id="price" name="price" required>
+        </div>
+
+
+        <div class="form-group">
+            <label for="image">画像</label>
+            <input type="file" id="image" name="image" accept="image/*">
+        </div>
+
+        <div class="form-group">
+            <label for="store">店舗名</label>
+            <input type="text" id="store" name="store" required>
+        </div>
+
+        <div class="button-group">
+            <button type="button" onclick="history.back()">戻る</button>
+            <button type="submit">登録</button>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>
+

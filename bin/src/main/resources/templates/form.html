@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>商品登録フォーム</title>
+     <link rel="stylesheet" href="css/form.css">
+</head>
+<body>
+    <p th:text="${error}"></p>
+    
+    <form th:action="@{/register}" method="post" enctype="multipart/form-data" th:object="${product}">
+    <input type="text" th:field="*{productName}" placeholder="商品名" required />
+    <input type="text" th:field="*{price}" placeholder="価格" required />
+    <input type="file" th:field="*{imageFile}" accept="image/*" />
+    <input type="text" th:field="*{storeName}" th:value="${storeName}" readonly />
+    <div th:if="${error}" th:text="${error}" style="color:red"></div>
+    <button type="submit">登録</button>
+</form>
+
+
+
+<a href="/home">ホームに戻る</a>
+</body>
+</html>

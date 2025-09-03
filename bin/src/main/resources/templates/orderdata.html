@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>お客様情報フォーム</title>
+   <link rel="stylesheet" href="css/orderdata.css">
+</head>
+<body>
+    <div class="form-container">
+        <h1>お客様情報入力</h1>
+        <form action="/save-order" method="post">
+            <label>お名前</label>
+            <div class="name-fields">
+                <input type="text" name="lastName" placeholder="姓" required>
+                <input type="text" name="firstName" placeholder="名" required>
+            </div>
+
+            <label>メールアドレス</label>
+            <input type="email" name="email" placeholder="例: example@example.com" required>
+
+            <label>電話番号</label>
+            <input type="tel" name="phone" placeholder="例: 090-1234-5678" required>
+
+            <input type="submit" value="送信する">
+        </form>
+    </div>
+</body>
+</html>
