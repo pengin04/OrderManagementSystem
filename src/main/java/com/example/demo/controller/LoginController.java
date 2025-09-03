@@ -2,23 +2,18 @@ package com.example.demo.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
-
-import org.apache.hc.client5.http.classic.methods.HttpPut;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.apache.hc.core5.http.io.entity.InputStreamEntity;
-import org.apache.hc.core5.http.ContentType;
-import org.apache.hc.core5.http.io.entity.EntityUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.entity.OrderManagement;
@@ -28,6 +23,7 @@ import com.example.demo.repository.OrderManagementRepository;
 import com.example.demo.repository.ProductRepository;
 import com.example.demo.repository.StoreRepository;
 import com.example.demo.service.LoginService;
+import com.example.demo.service.SupabaseStorageService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -45,6 +41,9 @@ public class LoginController {
 
     @Autowired
     private StoreRepository storeRepository;
+    
+    @Autowired
+    private SupabaseStorageService storageService;
 
     @Value("${supabase.project-ref}")
 private String projectRef;
@@ -115,45 +114,13 @@ private String secretKey;
             String fileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();
             String objectPath = "products/" + fileName;
 
-            // Supabase Storage REST API URL
-            String uploadUrl = String.format(
-                    "https://%s.supabase.co/storage/v1/object/%s/%s",
-                    projectRef, bucket, objectPath
-            );
+            // Service 経由で Supabase にアップロード
+            String publicUrl = storageService.uploadFile(imageFile.getBytes(), objectPath, imageFile.getContentType());
 
-            try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-                HttpPut put = new HttpPut(uploadUrl);
-                put.setHeader("Authorization", "Bearer " + secretKey);
-                String contentType = imageFile.getContentType();
-                if (contentType == null || contentType.isBlank()) contentType = "application/octet-stream";
-                put.setHeader("Content-Type", contentType);
-
-                InputStreamEntity entity = new InputStreamEntity(
-                        imageFile.getInputStream(),
-                        imageFile.getSize(),
-                        ContentType.parse(contentType)
-                );
-                put.setEntity(entity);
-
-                var response = httpClient.execute(put);
-                int statusCode = response.getCode();
-                String body = EntityUtils.toString(response.getEntity());
-                System.out.println("Supabase response: " + statusCode + " " + body);
-
-                if (statusCode != 200 && statusCode != 201) {
-                    model.addAttribute("error", "Supabaseアップロード失敗: " + statusCode + " " + body);
-                    return "form";
-                }
-            }
-
-            // 公開 URL
-            String publicUrl = String.format(
-                    "https://%s.supabase.co/storage/v1/object/public/%s/%s",
-                    projectRef, bucket, objectPath
-            );
+            // DB 保存
             product.setImageUrl(publicUrl);
-
             productRepository.save(product);
+
             model.addAttribute("message", "商品が正常に登録されました！");
             return "register_success";
 
@@ -163,7 +130,6 @@ private String secretKey;
             return "form";
         }
     }
-
     @GetMapping("/productlist")
     public String showProductList(Model model, HttpSession session) {
         String storeName = (String) session.getAttribute("storeName");
