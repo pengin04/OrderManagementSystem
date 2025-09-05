@@ -24,6 +24,16 @@ public class OrderManagement {
     private LocalDateTime pickup_time;
     private String item_details; // 新しいカラム（商品名＋数量）
     private Integer total_price; // 新しいカラム（合計金額）
+    
+    private Boolean mailSent = false;   // ← 追加
+    private Boolean pickedUp = false;   // ← 追加
+    
+    // getter/setter
+    public Boolean getMailSent() { return mailSent; }
+    public void setMailSent(Boolean mailSent) { this.mailSent = mailSent; }
+
+    public Boolean getPickedUp() { return pickedUp; }
+    public void setPickedUp(Boolean pickedUp) { this.pickedUp = pickedUp; }
 
 	public Integer getOrder_id() {
 		return order_id;

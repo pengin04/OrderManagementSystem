@@ -9,6 +9,11 @@
     <div class="container">
         <h1>注文履歴</h1>
         
+        <div class="center-button">
+            <a href="/orders" class="button">受け取り済み一覧を見る</a>
+        </div>
+
+        
         <table>
             <thead>
                 <tr>
@@ -17,19 +22,41 @@
                     <th>携帯番号</th> <!-- 追加 -->
                     <th>商品詳細</th>
                     <th>合計金額</th>
-                    <th>受け取り時間</th>
+                    <th>注文日時</th>
                 </tr>
             </thead>
             <tbody>
-                <tr th:each="order : ${orders}">
-                    <td th:text="${order.order_id}">1</td>
-                    <td th:text="${order.customer_name}">山田太郎</td> <!-- 追加 -->
-                    <td th:text="${order.phone_number}">090-1234-5678</td> <!-- 追加 -->
-                    <td th:text="${order.item_details}">コーヒー×2, パン×1</td>
-                    <td>¥<span th:text="${order.total_price}">500</span></td>
-                    <td th:text="${#temporals.format(order.pickup_time, 'yyyy-MM-dd HH:mm')}">2025-05-15 12:00</td>
-                </tr>
-            </tbody>
+<tr th:each="order : ${orders}" th:if="${!order.pickedUp}">
+    <td th:text="${order.order_id}">1</td>
+    <td th:text="${order.customer_name}">山田太郎</td>
+    <td th:text="${order.phone_number}">090-1234-5678</td>
+    <td th:text="${order.item_details}">コーヒー×2, パン×1</td>
+    <td>¥<span th:text="${order.total_price}">500</span></td>
+    <td th:text="${#temporals.format(order.pickup_time, 'yyyy-MM-dd HH:mm')}">2025-05-15 12:00</td>
+
+    <!-- メール送信ボタン -->
+    <td>
+        <form th:action="@{/order/send-mail}" method="post">
+            <input type="hidden" th:name="email" th:value="${order.email}" />
+            <input type="hidden" th:name="customerName" th:value="${order.customer_name}" />
+            <input type="hidden" th:name="itemDetails" th:value="${order.item_details}" />
+            <input type="hidden" th:name="totalPrice" th:value="${order.total_price}" />
+            <button type="submit" th:disabled="${order.mailSent}">メール送信</button>
+        </form>
+    </td>
+
+    <!-- 受け渡し済みボタン -->
+    <td>
+        <form th:action="@{/order/mark-picked-up}" method="post">
+            <input type="hidden" th:name="orderId" th:value="${order.order_id}" />
+            <button type="submit" th:disabled="${order.pickedUp}">
+                <span th:text="${order.pickedUp} ? '受け渡し済み' : '受け渡し済みにする'"></span>
+            </button>
+        </form>
+    </td>
+</tr>
+</tbody>
+
         </table>
 
         

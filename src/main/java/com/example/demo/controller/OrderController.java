@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -100,13 +101,40 @@ public class OrderController {
     public String receivetimePage() {
         return "receivetime";
     }
+    
+    @GetMapping("/orders")
+    public String showPickedUpOrders(Model model) {
+        // pickedUp が true の注文だけ取得
+        List<OrderManagement> pickedUpOrders = orderManagementRepository.findByPickedUpTrue();
+        model.addAttribute("orders", pickedUpOrders);
+        return "orders"; // orders.html を作る
+    }
+
 
     @GetMapping("/order")
     public String orderPage(Model model) {
         List<Product> products = productRepository.findAll();
-        model.addAttribute("products", products);
+
+        // storeNameごとにグループ化
+        Map<String, List<Product>> productsByStore =
+                products.stream().collect(Collectors.groupingBy(Product::getStoreName));
+
+        model.addAttribute("productsByStore", productsByStore);
         return "order";
     }
+    
+    @PostMapping("/order/mark-picked-up")
+    public String markPickedUp(@RequestParam("orderId") Integer orderId) {
+        OrderManagement order = orderManagementRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid order ID: " + orderId));
+
+        order.setPickedUp(true); // ← 受け渡し済みにする
+        orderManagementRepository.save(order);
+
+        return "redirect:/orderlist"; // 注文一覧画面に戻す（パスは環境に合わせて調整）
+    }
+
+
 
     @PostMapping("/receivetime/save")
     public String savePickupTime(@RequestParam("pickup_datetime") String datetime, HttpSession session) {

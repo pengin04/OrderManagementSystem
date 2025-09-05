@@ -38,4 +38,28 @@ public class MailController {
 
         return "mail_form"; // 再びフォームページを表示
     }
+    @PostMapping("/order/send-mail")
+    public String sendOrderReadyMail(
+            @RequestParam String email,
+            @RequestParam String customerName,
+            @RequestParam String itemDetails,
+            @RequestParam int totalPrice,
+            Model model) {
+
+        // 定型文送信
+        String content = "以下の内容でご注文を承りました。\n\n" +
+                         "お名前: " + customerName + "\n" +
+                         "注文内容:\n" + itemDetails + "\n" +
+                         "合計金額: ¥" + totalPrice + "\n\n" +
+                         "商品をご準備できましたので、受け取り可能です。\n\n" +
+                         "本メールは自動送信されています。";
+
+        mailService.sendOrderConfirmationMail(email, customerName, itemDetails, totalPrice);
+
+        model.addAttribute("successMessage", customerName + "様にメールを送信しました。");
+
+        // 再度注文一覧ページに戻る
+        return "redirect:/orderlist";
+    }
+
 }

@@ -39,12 +39,12 @@ public class MailService {
 	public void sendOrderConfirmationMail(String toEmail, String name, String orderDetails, int totalPrice) {
 	    SimpleMailMessage message = new SimpleMailMessage();
 	    message.setTo(toEmail);
-	    message.setSubject("【注文確認】ご注文ありがとうございました");
+	    message.setSubject("【注文準備完了】商品を受け取れます");
 	    message.setText("以下の内容でご注文を承りました。\n\n" +
 	                    "お名前: " + name + "\n" +
 	                    "注文内容:\n" + orderDetails + "\n" +
 	                    "合計金額: ¥" + totalPrice + "\n\n" +
-	                    "ご利用いただきありがとうございます。\n\n" +
+	                    "商品をご準備できましたので、受け取り可能です。\n\n" +
 	                    "本メールは自動送信されています。");
 
 	    mailSender.send(message);
@@ -138,6 +138,7 @@ public class MailService {
 	     mailSender.send(message);
 	 }
 
+	 
 
 }
 

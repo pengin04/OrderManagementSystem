@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>受け渡し済み注文一覧</title>
+    <link rel="stylesheet" href="css/order.css">
+</head>
+<body>
+<h1>受け渡し済み注文一覧</h1>
+<table border="1">
+    <tr>
+        <th>注文ID</th>
+        <th>顧客名</th>
+        <th>注文内容</th>
+        <th>合計金額</th>
+        <th>受け渡し時間</th>
+    </tr>
+    <tr th:each="order : ${orders}">
+        <td th:text="${order.order_id}"></td>
+        <td th:text="${order.customer_name}"></td>
+        <td th:text="${order.item_details}"></td>
+        <td th:text="${order.total_price}"></td>
+        <td th:text="${order.pickup_time}"></td>
+    </tr>
+</table>
+</body>
+</html>
