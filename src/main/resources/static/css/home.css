@@ -1,32 +1,102 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    background-color: #f9f9f9;
+}
 
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      margin-top: 100px;
-    }
-    h1 {
-      font-size: 16px;
-      margin-bottom: 50px;
-    }
-    .button {
-      display: block;
-      width: 200px;
-      margin: 20px auto;
-      padding: 15px 0;
-      border: 1px solid #000;
-      text-decoration: none;
-      color: #000;
-      font-size: 14px;
-    }
+/* サイドバー */
+.sidebar {
+    width: 200px;
+    background: #333;
+    color: white;
+    padding: 20px;
+    height: 100vh;
+}
 
-    
-    .logout {
-      display: block;
-      width: 200px;
-      margin: 20px auto;
-      padding: 15px 0;
-      border: 1px solid #000;
-      text-decoration: none;
-      color: #000;
-      font-size: 14px;
-    }
+.sidebar h2 {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar ul li {
+    margin-bottom: 10px;
+}
+
+.sidebar ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+/* メインコンテンツ */
+.main-content {
+    flex-grow: 1;
+    padding: 20px;
+}
+
+h2 {
+    margin-bottom: 20px;
+}
+
+/* アクションボタン */
+.action-buttons {
+    margin-bottom: 10px;
+}
+
+.button {
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    margin-right: 5px;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #0056b3;
+}
+
+/* フィルター */
+.filter {
+    margin-bottom: 10px;
+}
+
+/* ユーザーリストのテーブル */
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.user-table th, .user-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+.user-table th {
+    background-color: #6a11cb;
+    color: white;
+}
+
+/* ページネーション */
+.pagination {
+    margin-top: 10px;
+}
+
+.pagination a {
+    text-decoration: none;
+    padding: 5px 10px;
+    background: #007bff;
+    color: white;
+    border-radius: 3px;
+}
+
+.pagination a:hover {
+    background: #0056b3;
+}

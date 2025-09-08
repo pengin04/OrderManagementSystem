@@ -9,7 +9,11 @@
     <div class="form-container">
         <h1>入力内容のご確認</h1>
         <p>選択商品: <span th:text="${session.item_details}">なし</span></p>
-		<p>合計金額: ¥<span th:text="${session.total_price}">0</span></p>
+<p>合計金額: <span th:text="${order.total_price}"></span> 円</p>
+
+<!-- 配達時だけ注意書き表示（赤文字） -->
+<p th:if="${deliveryNote}" style="color:red;" th:text="${deliveryNote}"></p>
+
         <form action="/order_complete" method="post">
     <input type="submit" value="確定">
 </form>

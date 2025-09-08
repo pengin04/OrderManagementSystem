@@ -1,20 +1,262 @@
 <!DOCTYPE html>
-<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>受け取り日時</title>
-    <link rel="stylesheet" href="css/order.css">
-    <script src="js/order.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品受け取り日時選択 - 船橋市場店</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        .input-focus:focus {
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+        }
+        .btn-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+        .night-fee-alert {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+        }
+        .store-info-card {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+        }
+    </style>
 </head>
-<body>
-    <div class="container">
-        <h1>商品受け取り日時</h1>
-        <form action="/receivetime/save" method="post">
-  <label for="pickup-datetime">受け取り日時:</label><br>
-  <input type="datetime-local" id="pickup-datetime" name="pickup_datetime" required><br><br>
-  <button type="submit">【次へ】メニューを選ぶ</button>
-</form>
+<body class="gradient-bg min-h-screen py-8">
+    <div class="container mx-auto px-4 max-w-2xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-white mb-2">
+                <i class="fas fa-calendar-alt mr-3"></i>商品受け取り日時
+            </h1>
+            <p class="text-white opacity-90">お客様のご都合に合わせて受け取り日時をお選びください</p>
+        </div>
+
+        <!-- Store Information Card -->
+        <div class="store-info-card rounded-xl p-6 mb-6 card-shadow text-white">
+            <div class="flex items-center mb-4">
+                <i class="fas fa-store text-2xl mr-3"></i>
+                <div>
+                    <h2 class="text-xl font-bold">国際理工カレッジ(ドーム)</h2>
+                    <p class="opacity-90">千葉県稲毛市穴川３丁目６−２５</p>
+                </div>
+            </div>
+            <div class="bg-white bg-opacity-20 rounded-lg p-4">
+                <div class="flex items-center mb-2">
+                    <i class="fas fa-clock mr-2"></i>
+                    <span class="font-semibold">受取可能時間</span>
+                </div>
+                <p class="text-sm">毎日 04:30 〜 翌02:30（年中無休）</p>
+            </div>
+        </div>
+
+        <!-- Night Fee Alert -->
+        <div class="night-fee-alert rounded-xl p-4 mb-6 card-shadow">
+            <div class="flex items-center">
+                <i class="fas fa-moon text-2xl mr-3"></i>
+                <div>
+                    <h3 class="font-bold text-lg">深夜料金について</h3>
+                    <p class="text-sm opacity-90">22:00〜翌05:00のお受け取りには深夜料金7%が加算されます</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Form -->
+        <div class="bg-white rounded-xl p-8 card-shadow">
+            <div class="mb-6">
+                <div class="flex items-center mb-4">
+                    <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3">2</span>
+                    <h3 class="text-2xl font-bold text-gray-800">受取日時を入力</h3>
+                    <span class="bg-red-500 text-white text-xs px-2 py-1 rounded ml-3">必須</span>
+                </div>
+            </div>
+
+            <form action="/receivetime/save" method="post" id="pickupForm">
+                <!-- Quick Options -->
+                <div class="mb-6">
+                    <label class="block text-lg font-semibold text-gray-700 mb-3">お受取日時</label>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <button type="button" class="bg-gradient-to-r from-green-400 to-green-600 text-white py-3 px-6 rounded-lg font-semibold btn-hover transition-all duration-300" onclick="setNowTime()">
+                            <i class="fas fa-bolt mr-2"></i>今すぐ
+                        </button>
+                        <button type="button" class="bg-gradient-to-r from-blue-400 to-blue-600 text-white py-3 px-6 rounded-lg font-semibold btn-hover transition-all duration-300" onclick="showDateTimePicker()">
+                            <i class="fas fa-calendar-plus mr-2"></i>時間を指定
+                        </button>
+                    </div>
+                </div>
+
+                <!-- DateTime Picker -->
+                <div id="dateTimeSection" class="mb-6 hidden">
+                    <div class="bg-gray-50 rounded-lg p-6">
+                        <label for="pickup-datetime" class="block text-lg font-semibold text-gray-700 mb-3">
+                            <i class="fas fa-calendar-check mr-2 text-blue-500"></i>受け取り日時を選択
+                        </label>
+                        <div class="relative">
+                            <input type="datetime-local" 
+                                   id="pickup-datetime" 
+                                   name="pickup_datetime" 
+                                   class="w-full p-4 border-2 border-gray-300 rounded-lg text-lg input-focus transition-all duration-300 focus:border-blue-500 focus:outline-none"
+                                   required>
+                            
+                        </div>
+                        <div class="mt-3 text-sm text-gray-600">
+                            <i class="fas fa-info-circle mr-1 text-blue-500"></i>
+                            現在時刻の30分後から1か月後までの間で指定可能です
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Selected Time Display -->
+                <div id="selectedTimeDisplay" class="mb-6 hidden">
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-500 text-xl mr-3"></i>
+                            <div>
+                                <h4 class="font-semibold text-gray-800">選択された受け取り日時</h4>
+                                <p id="selectedTimeText" class="text-lg font-bold text-blue-600"></p>
+                                <p id="nightFeeWarning" class="text-sm text-orange-600 hidden">
+                                    <i class="fas fa-exclamation-triangle mr-1"></i>深夜料金7%が加算されます
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Important Notes -->
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded mb-6">
+                    <div class="flex">
+                        <i class="fas fa-exclamation-triangle text-yellow-400 text-xl mr-3 mt-1"></i>
+                        <div>
+                            <h4 class="font-semibold text-gray-800 mb-2">ご注意事項</h4>
+                            <ul class="text-sm text-gray-700 space-y-1">
+                                <li>• 注文が集中した際は、ご指定時間にご用意できない場合がございます</li>
+                                <li>• お受け取り時間の入力間違いにご注意ください（午後6時→18:00等）</li>
+                                <li>• 受け取り時間を過ぎた場合、商品の品質保持ができない場合があります</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" 
+                        class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-4 px-8 rounded-lg text-xl font-bold btn-hover transition-all duration-300 transform">
+                    <i class="fas fa-arrow-right mr-3"></i>【次へ】メニューを選ぶ
+                </button>
+            </form>
+        </div>
+
+        <!-- Footer Info -->
+        <div class="text-center mt-8 text-white opacity-75">
+            <p class="text-sm">お困りの際は店舗まで直接お電話ください</p>
+        </div>
     </div>
+
+    <script>
+        // Set minimum and maximum dates
+        function setDateTimeConstraints() {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() + 30); // 30 minutes from now
+            
+            const oneMonthLater = new Date();
+            oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
+            
+            const datetimeInput = document.getElementById('pickup-datetime');
+            datetimeInput.min = formatDateTime(now);
+            datetimeInput.max = formatDateTime(oneMonthLater);
+        }
+
+        function formatDateTime(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+
+        function formatDisplayDateTime(date) {
+            const options = {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                weekday: 'long',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            return date.toLocaleString('ja-JP', options);
+        }
+
+        function setNowTime() {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() + 30);
+            
+            const datetimeInput = document.getElementById('pickup-datetime');
+            datetimeInput.value = formatDateTime(now);
+            
+            showSelectedTime(now);
+            document.getElementById('dateTimeSection').classList.add('hidden');
+        }
+
+        function showDateTimePicker() {
+            document.getElementById('dateTimeSection').classList.remove('hidden');
+            document.getElementById('selectedTimeDisplay').classList.add('hidden');
+        }
+
+        function showSelectedTime(date) {
+            const display = document.getElementById('selectedTimeDisplay');
+            const timeText = document.getElementById('selectedTimeText');
+            const nightWarning = document.getElementById('nightFeeWarning');
+            
+            timeText.textContent = formatDisplayDateTime(date);
+            
+            const hour = date.getHours();
+            if (hour >= 22 || hour < 5) {
+                nightWarning.classList.remove('hidden');
+            } else {
+                nightWarning.classList.add('hidden');
+            }
+            
+            display.classList.remove('hidden');
+        }
+
+        // Event listeners
+        document.getElementById('pickup-datetime').addEventListener('change', function() {
+            if (this.value) {
+                const selectedDate = new Date(this.value);
+                showSelectedTime(selectedDate);
+            }
+        });
+
+        document.getElementById('pickupForm').addEventListener('submit', function(e) {
+            const datetimeInput = document.getElementById('pickup-datetime');
+            if (!datetimeInput.value) {
+                e.preventDefault();
+                alert('受け取り日時を選択してください。');
+                return false;
+            }
+            
+            const selectedDate = new Date(datetimeInput.value);
+            const now = new Date();
+            
+            if (selectedDate <= now) {
+                e.preventDefault();
+                alert('現在時刻より後の日時を選択してください。');
+                return false;
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            setDateTimeConstraints();
+        });
+    </script>
 </body>
 </html>
-

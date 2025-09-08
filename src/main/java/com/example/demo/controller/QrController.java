@@ -32,6 +32,7 @@ public class QrController {
     	String url = "http://192.168.11.65:8080/receivetime";
 
 
+
         int width = 300;
         int height = 300;
 

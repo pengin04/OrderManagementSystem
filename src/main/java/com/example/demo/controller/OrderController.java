@@ -67,27 +67,46 @@ public class OrderController {
             @RequestParam String firstName,
             @RequestParam String email,
             @RequestParam String phone,
-            HttpSession session) {
+            @RequestParam String deliveryType,
+            @RequestParam(required = false) String deliveryAddress,
+            HttpSession session,
+            Model model) {
 
-        String customerName = lastName + " " + firstName;
-        LocalDateTime pickupTime = (LocalDateTime) session.getAttribute("pickup_time");
-
-        String itemDetails = (String) session.getAttribute("item_details");
         Integer totalPrice = (Integer) session.getAttribute("total_price");
+        if ("delivery".equals(deliveryType)) {
+            totalPrice += 100;
+            session.setAttribute("deliveryNote", "※配達の場合、別途100円が加算されています。");
+        } else {
+            session.setAttribute("deliveryNote", null);
+        }
+
+        // ★ログイン中の店舗名をセッションから取得
+        String storeName = (String) session.getAttribute("storeName");
 
         OrderManagement order = new OrderManagement();
-        order.setCustomer_name(customerName);
+        order.setCustomer_name(lastName + " " + firstName);
         order.setEmail(email);
         order.setPhone_number(phone);
-        order.setPickup_time(pickupTime);
-        order.setStore_id(1); // 固定値
-        order.setOrdered_item(itemDetails); // 旧フィールドを再利用
-        order.setItem_details(itemDetails); // 新カラム（仮名）
-        order.setTotal_price(totalPrice);   // 新カラム（仮名）
+        order.setDeliveryType(deliveryType); // ← 修正済み
+        order.setDelivery_address(deliveryAddress);
+        order.setItem_details((String) session.getAttribute("item_details"));
+        order.setTotal_price(totalPrice);
+        order.setOrder_time(LocalDateTime.now());
+        order.setPickup_time((LocalDateTime) session.getAttribute("pickup_time"));
+        order.setStoreName(storeName);
+
+        // ★ここで店舗名をセット
+        order.setStoreName(storeName);
 
         orderManagementRepository.save(order);
 
-        return "redirect:/confirmation";
+        model.addAttribute("order", order);
+
+        session.setAttribute("deliveryType", deliveryType);
+        session.setAttribute("deliveryAddress", deliveryAddress);
+        session.setAttribute("total_price", totalPrice);
+
+        return "confirmation";
     }
 
 
@@ -103,12 +122,41 @@ public class OrderController {
     }
     
     @GetMapping("/orders")
-    public String showPickedUpOrders(Model model) {
-        // pickedUp が true の注文だけ取得
-        List<OrderManagement> pickedUpOrders = orderManagementRepository.findByPickedUpTrue();
+    public String showPickedUpOrders(Model model, HttpSession session) {
+        String storeName = (String) session.getAttribute("storeName");
+        if (storeName == null) {
+            return "redirect:/login";
+        }
+
+        List<OrderManagement> pickedUpOrders = 
+                orderManagementRepository.findByStoreNameAndPickedUpTrue(storeName);
+
         model.addAttribute("orders", pickedUpOrders);
-        return "orders"; // orders.html を作る
+        return "orders"; // orders.html
     }
+
+    @GetMapping("/delivery-orders")
+    public String showDeliveryOrders(Model model, HttpSession session) {
+        String storeName = (String) session.getAttribute("storeName");
+        if (storeName == null) {
+            return "redirect:/login";
+        }
+
+        List<OrderManagement> deliveryOrders = 
+                orderManagementRepository.findByStoreNameAndDeliveryType(storeName, "delivery");
+
+        model.addAttribute("orders", deliveryOrders);
+        return "delivery-orders"; // delivery-orders.html
+    }
+
+    
+//    @GetMapping("/delivery-orders")
+//    public String showDeliveryOrders(Model model) {
+//        List<OrderManagement> deliveryOrders = orderManagementRepository.findByDeliveryType("delivery");
+//        model.addAttribute("orders", deliveryOrders);
+//        return "delivery-orders";
+//    }
+
 
 
     @GetMapping("/order")
@@ -128,10 +176,11 @@ public class OrderController {
         OrderManagement order = orderManagementRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid order ID: " + orderId));
 
-        order.setPickedUp(true); // ← 受け渡し済みにする
+        order.setPickedUp(true);
+        order.setCompleted_time(LocalDateTime.now()); // 受け渡し完了日時を保存
         orderManagementRepository.save(order);
 
-        return "redirect:/orderlist"; // 注文一覧画面に戻す（パスは環境に合わせて調整）
+        return "redirect:/orderlist";
     }
 
 

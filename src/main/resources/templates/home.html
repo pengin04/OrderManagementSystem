@@ -3,16 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <title>商品管理システム</title>
- <link rel="stylesheet" href="css/home.css">
+  <link rel="stylesheet" href="css/home.css">
 </head>
 <body>
-  <h1>商品管理</h1>
- <a href="/form" class="button">商品登録</a>
-  <a href="/productlist" class="button">商品編集</a>
-  <a href="/orderlist" class="button">注文リスト</a>
-  <div th:if="${message}">
-    <p th:text="${message}" style="color: green;"></p>
-</div>
-<a href="/logout" class="logout">ログアウト</a>
+  <!-- サイドバー -->
+  <div class="sidebar">
+    <h2>管理メニュー</h2>
+    <ul>
+      <li><a href="/form">📦 商品登録</a></li>
+      <li><a href="/productlist">📝 商品編集</a></li>
+      <li><a href="/orderlist">🛒 注文リスト</a></li>
+      <li><a href="/delivery-orders">🚚 配達注文リスト</a></li>
+      <li><a href="/logout" class="logout">🚪 ログアウト</a></li>
+    </ul>
+  </div>
+
+  <!-- メインコンテンツ -->
+  <div class="main-content">
+    <h1>商品管理システム</h1>
+
+    <div class="action-buttons">
+      <a href="/form" class="button">＋ 新規商品を登録</a>
+      <a href="/orderlist" class="button">注文状況を確認</a>
+    </div>
+
+    <div class="filter">
+      <p>ようこそ！ここから各種管理メニューにアクセスできます。</p>
+    </div>
+
+    <div th:if="${message}">
+      <p th:text="${message}" style="color: green; font-weight: bold;"></p>
+    </div>
+  </div>
 </body>
 </html>

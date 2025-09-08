@@ -76,8 +76,14 @@ private String secretKey;
     }
 
     @GetMapping("/orderlist")
-    public String showOrderList(Model model) {
-        List<OrderManagement> orders = orderRepository.findAll();
+    public String showOrderList(Model model, HttpSession session) {
+        String storeName = (String) session.getAttribute("storeName");
+        if (storeName == null) {
+            return "redirect:/login"; // セッション切れ対応
+        }
+
+        // 店舗ごとの注文だけ取得
+        List<OrderManagement> orders = orderRepository.findByStoreName(storeName);
         model.addAttribute("orders", orders);
         return "orderlist";
     }

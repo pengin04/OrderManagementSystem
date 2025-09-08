@@ -10,11 +10,11 @@
         <h1>注文履歴</h1>
         
         <div class="center-button">
-            <a href="/orders" class="button">受け取り済み一覧を見る</a>
-        </div>
+    <a href="/orders" class="button danger">受け取り済み一覧を見る</a>
+</div>
 
         
-        <table>
+        <table class="order-table danger">
             <thead>
                 <tr>
                     <th>注文ID</th>
@@ -22,6 +22,7 @@
                     <th>携帯番号</th> <!-- 追加 -->
                     <th>商品詳細</th>
                     <th>合計金額</th>
+                    <th>受取日時</th>
                     <th>注文日時</th>
                 </tr>
             </thead>
@@ -33,6 +34,7 @@
     <td th:text="${order.item_details}">コーヒー×2, パン×1</td>
     <td>¥<span th:text="${order.total_price}">500</span></td>
     <td th:text="${#temporals.format(order.pickup_time, 'yyyy-MM-dd HH:mm')}">2025-05-15 12:00</td>
+    <td th:text="${#temporals.format(order.order_time, 'yyyy-MM-dd HH:mm')}"></td>
 
     <!-- メール送信ボタン -->
     <td>

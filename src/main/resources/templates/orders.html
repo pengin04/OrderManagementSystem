@@ -1,27 +1,61 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>受け渡し済み注文一覧</title>
     <link rel="stylesheet" href="css/order.css">
 </head>
 <body>
-<h1>受け渡し済み注文一覧</h1>
-<table border="1">
-    <tr>
-        <th>注文ID</th>
-        <th>顧客名</th>
-        <th>注文内容</th>
-        <th>合計金額</th>
-        <th>受け渡し時間</th>
-    </tr>
-    <tr th:each="order : ${orders}">
-        <td th:text="${order.order_id}"></td>
-        <td th:text="${order.customer_name}"></td>
-        <td th:text="${order.item_details}"></td>
-        <td th:text="${order.total_price}"></td>
-        <td th:text="${order.pickup_time}"></td>
-    </tr>
-</table>
+    <div class="container">
+        <h1>受け渡し済み注文一覧</h1>
+
+        <div class="center-button">
+            <a href="/orderlist" class="button">注文履歴に戻る</a>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>注文ID</th>
+                    <th>顧客名</th>
+                    <th>注文内容</th>
+                    <th>合計金額</th>
+                    <th>受け渡し完了日時</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="order : ${orders}">
+                    <td th:text="${order.order_id}"></td>
+                    <td th:text="${order.customer_name}"></td>
+                    <td th:text="${order.item_details}"></td>
+                    <td>¥<span th:text="${order.total_price}"></span></td>
+                    <td th:text="${#temporals.format(order.completed_time, 'yyyy-MM-dd HH:mm')}"></td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="3">総売上</th>
+                    <th id="total-sum"></th>
+                    <th></th>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="center-button">
+            <a href="/home" class="button">ホームに戻る</a>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener("DOMContentLoaded", () => {
+            let total = 0;
+            document.querySelectorAll("tbody tr").forEach(row => {
+                let priceText = row.querySelector("td:nth-child(4) span")?.textContent || "0";
+                let price = parseInt(priceText.replace(/[^0-9]/g, ""), 10) || 0;
+                total += price;
+            });
+            document.getElementById("total-sum").textContent = "¥" + total.toLocaleString();
+        });
+    </script>
 </body>
 </html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>配達注文一覧</title>
+</head>
+<body>
+    <h1>配達注文一覧</h1>
+
+    <table border="1">
+        <tr>
+            <th>注文ID</th>
+            <th>名前</th>
+            <th>電話番号</th>
+            <th>メール</th>
+            <th>注文日時</th>
+            <th>受け取り日時</th>
+            <th>商品詳細</th>
+            <th>金額</th>
+            <th>配達先住所</th>
+        </tr>
+        <tr th:each="order : ${orders}">
+            <td th:text="${order.order_id}"></td>
+            <td th:text="${order.customer_name}"></td>
+            <td th:text="${order.phone_number}"></td>
+            <td th:text="${order.email}"></td>
+            <td th:text="${#temporals.format(order.order_time, 'yyyy/MM/dd HH:mm')}"></td>
+            <td th:text="${#temporals.format(order.pickup_time, 'yyyy/MM/dd HH:mm')}"></td>
+            <td th:text="${order.item_details}"></td>
+            <td th:text="${order.total_price}"></td>
+            <td th:text="${order.delivery_address}"></td>
+        </tr>
+    </table>
+
+    <br>
+    <a href="/orders">注文一覧に戻る</a>
+</body>
+</html>

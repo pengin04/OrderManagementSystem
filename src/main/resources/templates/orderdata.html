@@ -8,21 +8,37 @@
 <body>
     <div class="form-container">
         <h1>お客様情報入力</h1>
-        <form action="/save-order" method="post">
-            <label>お名前</label>
-            <div class="name-fields">
-                <input type="text" name="lastName" placeholder="姓" required>
-                <input type="text" name="firstName" placeholder="名" required>
-            </div>
+        <form th:action="@{/save-order}" method="post">
+    <label>姓: <input type="text" name="lastName" required></label><br>
+    <label>名: <input type="text" name="firstName" required></label><br>
+    <label>メール: <input type="email" name="email" required></label><br>
+    <label>電話番号: <input type="text" name="phone" required></label><br>
 
-            <label>メールアドレス</label>
-            <input type="email" name="email" placeholder="例: example@example.com" required>
+    <!-- 受け取り方法 -->
+    <label>
+        <input type="radio" name="deliveryType" value="pickup" checked 
+               onclick="toggleAddress(false)"> 店舗受け取り
+    </label>
+    <label>
+        <input type="radio" name="deliveryType" value="delivery" 
+               onclick="toggleAddress(true)"> 配達
+    </label><br>
 
-            <label>電話番号</label>
-            <input type="tel" name="phone" placeholder="例: 090-1234-5678" required>
+    <!-- 配達先入力欄 -->
+    <div id="addressField" style="display:none;">
+        <label>配達先入力欄※配達の場合料金100円かかります<br>
+            <textarea name="deliveryAddress"placeholder="例:六号館2階"></textarea>
+        </label>
+    </div>
 
-            <input type="submit" value="送信する">
-        </form>
+    <button type="submit">注文を確定する</button>
+</form>
+
+<script>
+function toggleAddress(show) {
+    document.getElementById("addressField").style.display = show ? "block" : "none";
+}
+</script>
     </div>
 </body>
 </html>
