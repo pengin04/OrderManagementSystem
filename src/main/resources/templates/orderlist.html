@@ -26,8 +26,9 @@
                     <th>注文日時</th>
                 </tr>
             </thead>
-            <tbody>
-<tr th:each="order : ${orders}" th:if="${!order.pickedUp}">
+<tbody>
+<tr th:each="order : ${orders}" 
+    th:if="${!order.pickedUp and order.deliveryType == 'pickup'}">
     <td th:text="${order.order_id}">1</td>
     <td th:text="${order.customer_name}">山田太郎</td>
     <td th:text="${order.phone_number}">090-1234-5678</td>
@@ -58,6 +59,8 @@
     </td>
 </tr>
 </tbody>
+
+
 
         </table>
 

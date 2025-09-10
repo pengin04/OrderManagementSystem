@@ -43,6 +43,28 @@
             background-color: #FF6B35;
             color: white;
         }
+        /* ボタンのスタイルを明確に定義 */
+button[type="button"] {
+    background-color: #F3F4F6 !important;
+    color: #374151 !important;
+    border: 1px solid #D1D5DB !important;
+}
+button[type="button"]:hover {
+    background-color: #E5E7EB !important;
+}
+.bg-orange-500 {
+    background-color: #F97316 !important;
+    color: white !important;
+}
+.bg-orange-500:hover {
+    background-color: #EA580C !important;
+}
+button[type="submit"] {
+    background-color: #F97316 !important;
+    color: white !important;
+    display: block !important;
+    width: 100% !important;
+}
     </style>
 </head>
 <body class="bg-gray-50">
@@ -79,26 +101,29 @@
                         出店店舗を選択
                     </h2>
                     <div class="flex flex-wrap gap-2" id="store-tabs-container">
-                        <button class="store-tab active px-4 py-2 rounded-full border border-orange-200 text-sm font-medium" onclick="showStore('all', this)">
-                            全店舗
-                        </button>
-                        <!-- Thymeleafで動的に店舗タブを生成 -->
-                        <th:block th:each="entry : ${productsByStore}">
-                            <button class="store-tab px-4 py-2 rounded-full border border-orange-200 text-sm font-medium" th:data-store-id="${#strings.replace(entry.key, ' ', '_')}" onclick="showStore(this.dataset.storeId, this)">
-                                <span th:text="${entry.key}">店舗名</span>
-                            </button>
-                        </th:block>
-                    </div>
+    <!-- Thymeleafで動的に店舗タブを生成 -->
+    <th:block th:each="entry, iterStat : ${productsByStore}">
+        <button class="store-tab px-4 py-2 rounded-full border border-orange-200 text-sm font-medium"
+                th:data-store-id="${#strings.replace(entry.key, ' ', '_')}"
+                th:classappend="${iterStat.index == 0} ? ' active' : ''"
+                onclick="showStore(this.dataset.storeId, this)">
+            <span th:text="${entry.key}">店舗名</span>
+        </button>
+    </th:block>
+</div>
                 </div>
 
                 <!-- メニュー一覧 -->
                 <form action="orderdata" method="post" id="order-form">
+					<input type="hidden" name="storeName" id="storeNameInput" value="${#strings.replace(productsByStore.keySet().iterator().next(), ' ', '_')}">
                     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" id="menu-container">
-                        <!-- Thymeleafで店舗とメニューを動的に生成 -->
+                        <!-- 	Thymeleafで店舗とメニューを動的に生成 -->
                         <th:block th:each="entry : ${productsByStore}">
                             <div th:each="product : ${entry.value}" class="sukiya-card bg-white rounded-lg shadow-md overflow-hidden" th:data-store="${#strings.replace(entry.key, ' ', '_')}">
-                                <img src="https://nffjuliyslvvhhpnhoxd.supabase.co/storage/v1/object/public/product-images/123.jpg" 
-                                     alt="商品画像" class="w-full h-48 object-cover">
+                                <img th:src="${product.imageUrl}" 
+     alt="商品画像" 
+     class="w-full h-48 object-cover">
+
                                 <div class="p-4">
                                     <h3 class="text-lg font-bold text-gray-800 mb-2" th:text="${product.productName}">商品名</h3>
                                     
@@ -280,6 +305,9 @@
                     item.style.display = 'none';
                 }
             });
+            // hidden input にセット
+    const storeInput = document.getElementById('storeNameInput');
+    storeInput.value = storeId;
         }
 
         // 初期化
@@ -292,6 +320,11 @@
                 input.addEventListener('change', updateTotal);
                 input.addEventListener('input', updateTotal);
             });
+            // ★ 最初のタブを自動的に適用
+    const firstTab = document.querySelector('.store-tab.active');
+    if (firstTab) {
+        showStore(firstTab.dataset.storeId, firstTab);
+    }
         });
     </script>
 </body>

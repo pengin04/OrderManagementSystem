@@ -29,7 +29,9 @@ public class QrController {
     @GetMapping(value = "/qr-image", produces = MediaType.IMAGE_PNG_VALUE)
     @ResponseBody
     public void generateQrImage(HttpServletResponse response) throws IOException {
-    	String url = "http://192.168.11.65:8080/receivetime";
+    	String url = "http://172.31.99.192:8080/receivetime";
+    	//家
+    	//String url = "http://192.168.11.65:8080/receivetime";
 
 
 

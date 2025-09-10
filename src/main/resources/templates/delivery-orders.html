@@ -1,38 +1,106 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>配達注文一覧</title>
+    <link rel="stylesheet" href="css/order.css">
+    <style>
+        body {
+            font-family: "Arial", sans-serif;
+            background-color: #f9fafb;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #16a34a;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        thead {
+            background-color: #16a34a;
+            color: white;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+            font-size: 14px;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #f3f4f6;
+        }
+        tfoot {
+            background-color: #f0fdf4;
+            font-weight: bold;
+        }
+        .center-button {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #16a34a;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        .button:hover {
+            background-color: #15803d;
+        }
+    </style>
 </head>
 <body>
-    <h1>配達注文一覧</h1>
+    <div class="container">
+        <h1>配達注文一覧</h1>
 
-    <table border="1">
-        <tr>
-            <th>注文ID</th>
-            <th>名前</th>
-            <th>電話番号</th>
-            <th>メール</th>
-            <th>注文日時</th>
-            <th>受け取り日時</th>
-            <th>商品詳細</th>
-            <th>金額</th>
-            <th>配達先住所</th>
-        </tr>
-        <tr th:each="order : ${orders}">
-            <td th:text="${order.order_id}"></td>
-            <td th:text="${order.customer_name}"></td>
-            <td th:text="${order.phone_number}"></td>
-            <td th:text="${order.email}"></td>
-            <td th:text="${#temporals.format(order.order_time, 'yyyy/MM/dd HH:mm')}"></td>
-            <td th:text="${#temporals.format(order.pickup_time, 'yyyy/MM/dd HH:mm')}"></td>
-            <td th:text="${order.item_details}"></td>
-            <td th:text="${order.total_price}"></td>
-            <td th:text="${order.delivery_address}"></td>
-        </tr>
-    </table>
+        <table>
+            <thead>
+                <tr>
+                    <th>注文ID</th>
+                    <th>名前</th>
+                    <th>電話番号</th>
+                    <th>メール</th>
+                    <th>注文日時</th>
+                    <th>受け取り日時</th>
+                    <th>商品詳細</th>
+                    <th>金額</th>
+                    <th>配達先住所</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="order : ${orders}">
+                    <td th:text="${order.order_id}"></td>
+                    <td th:text="${order.customer_name}"></td>
+                    <td th:text="${order.phone_number}"></td>
+                    <td th:text="${order.email}"></td>
+                    <td th:text="${#temporals.format(order.order_time, 'yyyy/MM/dd HH:mm')}"></td>
+                    <td th:text="${#temporals.format(order.pickup_time, 'yyyy/MM/dd HH:mm')}"></td>
+                    <td th:text="${order.item_details}"></td>
+                    <td>¥<span th:text="${order.total_price}"></span></td>
+                    <td th:text="${order.delivery_address}"></td>
+                </tr>
+            </tbody>
+        </table>
 
-    <br>
-    <a href="/orders">注文一覧に戻る</a>
+        <div class="center-button">
+            <a href="/home" class="button">ホームに戻る</a>
+        </div>
+    </div>
 </body>
 </html>

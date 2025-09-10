@@ -1,4 +1,79 @@
+<style>
+	    /* 注文完了メッセージ */
+.complete-message {
+    max-width: 600px;
+    margin: 80px auto;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    padding: 40px 30px;
+    text-align: center;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+/* 見出し */
+.complete-message h1 {
+    font-size: 30px;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 20px;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+.complete-message h1::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    border-radius: 2px;
+}
+
+/* サブメッセージ */
+.complete-message p {
+    font-size: 18px;
+    color: #4a5568;
+    line-height: 1.6;
+    margin-top: 15px;
+}
+
+/* ✅アイコンを追加 */
+.complete-message::before {
+    content: "🎉";
+    display: block;
+    font-size: 40px;
+    margin-bottom: 20px;
+    animation: bounce 1.2s infinite;
+}
+
+/* アニメーション */
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+/* スマホ対応 */
+@media (max-width: 768px) {
+    .complete-message {
+        margin: 40px auto;
+        padding: 25px 20px;
+    }
+    .complete-message h1 {
+        font-size: 24px;
+    }
+    .complete-message p {
+        font-size: 16px;
+    }
+}
+
+    </style>
+
 <div class="complete-message">
     <h1>ご注文ありがとうございました</h1>
     <p th:text="${message}">注文完了のメッセージ</p>
+   
 </div>

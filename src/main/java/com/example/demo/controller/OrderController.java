@@ -33,6 +33,12 @@ public class OrderController {
     public String handleOrderData(@RequestParam Map<String, String> allParams, HttpSession session) {
         StringBuilder itemDetailsBuilder = new StringBuilder();
         int totalPrice = 0;
+        
+     // ★★★ 修正箇所 1: storeName を allParams から取得し、セッションに保存する ★★★
+        String storeName = allParams.get("storeName");
+        if (storeName != null) {
+            session.setAttribute("selectedStoreName", storeName); // セッションキー名を明確化
+        }
 
         for (Map.Entry<String, String> entry : allParams.entrySet()) {
             if (entry.getKey().startsWith("quantity_")) {
@@ -81,7 +87,7 @@ public class OrderController {
         }
 
         // ★ログイン中の店舗名をセッションから取得
-        String storeName = (String) session.getAttribute("storeName");
+        String storeNameFromSession = (String) session.getAttribute("selectedStoreName"); // セッションキー名を変更
 
         OrderManagement order = new OrderManagement();
         order.setCustomer_name(lastName + " " + firstName);
@@ -93,10 +99,10 @@ public class OrderController {
         order.setTotal_price(totalPrice);
         order.setOrder_time(LocalDateTime.now());
         order.setPickup_time((LocalDateTime) session.getAttribute("pickup_time"));
-        order.setStoreName(storeName);
+        order.setStoreName(storeNameFromSession);
 
         // ★ここで店舗名をセット
-        order.setStoreName(storeName);
+        order.setStoreName(storeNameFromSession);
 
         orderManagementRepository.save(order);
 
@@ -198,8 +204,8 @@ public class OrderController {
         return "automaticmail";
     }
 	
-	@GetMapping("/confirmation")
-    public String confirmationPage() {
-        return "confirmation";
-    }
+//	@GetMapping("/confirmation")
+//    public String confirmationPage() {
+//        return "confirmation";
+//    }
 }

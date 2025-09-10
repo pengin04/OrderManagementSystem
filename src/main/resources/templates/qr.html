@@ -1,12 +1,255 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>QRコード表示</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QRコード表示 - 注文ページ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            padding: 40px;
+            text-align: center;
+            max-width: 480px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .header {
+            margin-bottom: 32px;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #666;
+            font-weight: 400;
+        }
+
+        .qr-section {
+            margin: 40px 0;
+            position: relative;
+        }
+
+        .qr-container {
+            display: inline-block;
+            padding: 24px;
+            background: #f8f9ff;
+            border-radius: 20px;
+            border: 3px solid #e8ecff;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .qr-container:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(102, 126, 234, 0.2);
+        }
+
+        .qr-code {
+            width: 180px;
+            height: 180px;
+            border-radius: 12px;
+            display: block;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+        }
+
+        .scan-instruction {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 16px;
+            margin: 24px 0;
+            font-size: 16px;
+            font-weight: 600;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+        }
+
+        .scan-icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        .description {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+            margin-top: 16px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .code-text {
+            background: #e8ecff;
+            color: #667eea;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .feature {
+            background: #f8f9ff;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .feature-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .footer {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #e8ecff;
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* レスポンシブデザイン */
+        @media (max-width: 480px) {
+            .container {
+                padding: 24px;
+                margin: 10px;
+            }
+
+            .title {
+                font-size: 24px;
+            }
+
+            .qr-code {
+                width: 160px;
+                height: 160px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .scan-instruction {
+                padding: 14px 20px;
+                font-size: 15px;
+            }
+        }
+
+        /* アニメーション */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .qr-container {
+            animation: fadeIn 0.8s ease-out 0.2s both;
+        }
+
+        .scan-instruction {
+            animation: fadeIn 1s ease-out 0.4s both;
+        }
+    </style>
 </head>
 <body>
-    <h1>注文ページ用QRコード</h1>
-    <img src="/qr-image" alt="QR Code" />
-    <p>このQRコードをスマホで読み取ると <code>/order</code> ページが開きます。</p>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">注文ページ用QRコード</h1>
+            <p class="subtitle">スマートフォンでスキャンしてご注文ください</p>
+        </div>
+
+        <div class="qr-section">
+            <div class="qr-container">
+                <img src="/qr-image" alt="注文ページQRコード" class="qr-code" />
+            </div>
+        </div>
+
+        <div class="scan-instruction">
+            <span class="scan-icon">📱</span>
+            カメラでQRコードをスキャン
+        </div>
+
+        <div class="description">
+            <p>このQRコードをスマートフォンのカメラで読み取ると、<span class="code-text">/order</span> ページが開きます。</p>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <span class="feature-icon">⚡</span>
+                <strong>簡単アクセス</strong><br>
+                タップ不要で即座にメニューページへ
+            </div>
+            <div class="feature">
+                <span class="feature-icon">🔒</span>
+                <strong>安全・安心</strong><br>
+                タッチレスでご注文いただけます
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>QRコードが読み取れない場合は、スタッフまでお声がけください</p>
+        </div>
+    </div>
 </body>
 </html>
