@@ -39,6 +39,17 @@ public class OrderManagement {
     private LocalDateTime order_time;       // 注文日時
     private LocalDateTime completed_time;   // 受け渡し完了日時
     
+    @Column(name = "reservation_number")
+    private Integer reservationNumber;
+
+    public Integer getReservationNumber() {
+        return reservationNumber;
+    }
+
+    public void setReservationNumber(Integer reservationNumber) {
+        this.reservationNumber = reservationNumber;
+    }
+    
     public String getStoreName() { return storeName; }
     public void setStoreName(String storeName) { this.storeName = storeName; }
     

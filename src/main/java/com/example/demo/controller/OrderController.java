@@ -88,7 +88,9 @@ public class OrderController {
 
         // ★ログイン中の店舗名をセッションから取得
         String storeNameFromSession = (String) session.getAttribute("selectedStoreName"); // セッションキー名を変更
-
+        // ★ ランダム4桁の予約番号生成
+        int reservationNumber = (int)(Math.random() * 9000) + 1000;
+        
         OrderManagement order = new OrderManagement();
         order.setCustomer_name(lastName + " " + firstName);
         order.setEmail(email);
@@ -100,6 +102,7 @@ public class OrderController {
         order.setOrder_time(LocalDateTime.now());
         order.setPickup_time((LocalDateTime) session.getAttribute("pickup_time"));
         order.setStoreName(storeNameFromSession);
+        order.setReservationNumber(reservationNumber); // ★追加（Entityにカラムが必要）
 
         // ★ここで店舗名をセット
         order.setStoreName(storeNameFromSession);
@@ -107,7 +110,8 @@ public class OrderController {
         orderManagementRepository.save(order);
 
         model.addAttribute("order", order);
-
+        //model.addAttribute("reservationNumber", reservationNumber);
+        session.setAttribute("reservationNumber", reservationNumber);
         session.setAttribute("deliveryType", deliveryType);
         session.setAttribute("deliveryAddress", deliveryAddress);
         session.setAttribute("total_price", totalPrice);

@@ -17,25 +17,26 @@
         <table class="order-table danger">
             <thead>
                 <tr>
-                    <th>注文ID</th>
+                    
                     <th>顧客名</th> <!-- 追加 -->
-                    <th>携帯番号</th> <!-- 追加 -->
-                    <th>商品詳細</th>
+                    <th>電話番号</th> <!-- 追加 -->
+                    <th>商品名</th>
                     <th>合計金額</th>
                     <th>受取日時</th>
                     <th>注文日時</th>
+                    <th>予約番号</th>
                 </tr>
             </thead>
 <tbody>
 <tr th:each="order : ${orders}" 
     th:if="${!order.pickedUp and order.deliveryType == 'pickup'}">
-    <td th:text="${order.order_id}">1</td>
     <td th:text="${order.customer_name}">山田太郎</td>
     <td th:text="${order.phone_number}">090-1234-5678</td>
     <td th:text="${order.item_details}">コーヒー×2, パン×1</td>
     <td>¥<span th:text="${order.total_price}">500</span></td>
     <td th:text="${#temporals.format(order.pickup_time, 'yyyy-MM-dd HH:mm')}">2025-05-15 12:00</td>
     <td th:text="${#temporals.format(order.order_time, 'yyyy-MM-dd HH:mm')}"></td>
+    <td th:text="${order.reservationNumber}"></td>
 
     <!-- メール送信ボタン -->
     <td>

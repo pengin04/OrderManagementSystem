@@ -13,6 +13,8 @@ import com.example.demo.entity.Mail;
 import com.example.demo.form.MailForm;
 import com.example.demo.service.MailService;
 
+import jakarta.servlet.http.HttpSession;
+
 @Controller
 public class AllController {
 
@@ -25,9 +27,11 @@ public class AllController {
 		return "index";
 	}
 
-	@PostMapping("/order_complete")
-	public String showHome1() {
-		return "order_complete";
+	@GetMapping("/order_complete")
+	public String showOrderComplete(HttpSession session, Model model) {
+	    Integer reservationNumber = (Integer) session.getAttribute("reservationNumber");
+	    model.addAttribute("reservationNumber", reservationNumber);
+	    return "order_complete"; // order_complete.html に予約番号だけ表示
 	}
 
 	@PostMapping("/sendMail")

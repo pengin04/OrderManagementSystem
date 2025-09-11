@@ -72,28 +72,26 @@
         <table>
             <thead>
                 <tr>
-                    <th>注文ID</th>
-                    <th>名前</th>
+                    <th>顧客名</th>
                     <th>電話番号</th>
-                    <th>メール</th>
-                    <th>注文日時</th>
-                    <th>受け取り日時</th>
-                    <th>商品詳細</th>
-                    <th>金額</th>
+                    <th>商品名</th>
+                    <th>合計金額</th>
+                    <th>受取日時</th>
+                    <th>注文日時</th>          
                     <th>配達先住所</th>
+                    <th>予約番号</th>
                 </tr>
             </thead>
             <tbody>
                 <tr th:each="order : ${orders}">
-                    <td th:text="${order.order_id}"></td>
                     <td th:text="${order.customer_name}"></td>
                     <td th:text="${order.phone_number}"></td>
-                    <td th:text="${order.email}"></td>
-                    <td th:text="${#temporals.format(order.order_time, 'yyyy/MM/dd HH:mm')}"></td>
-                    <td th:text="${#temporals.format(order.pickup_time, 'yyyy/MM/dd HH:mm')}"></td>
                     <td th:text="${order.item_details}"></td>
                     <td>¥<span th:text="${order.total_price}"></span></td>
+                    <td th:text="${#temporals.format(order.pickup_time, 'yyyy/MM/dd HH:mm')}"></td>
+                    <td th:text="${#temporals.format(order.order_time, 'yyyy/MM/dd HH:mm')}"></td>                                       
                     <td th:text="${order.delivery_address}"></td>
+                    <td th:text="${order.reservationNumber}"></td>
                 </tr>
             </tbody>
         </table>

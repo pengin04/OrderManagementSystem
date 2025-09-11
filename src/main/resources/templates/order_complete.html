@@ -1,79 +1,216 @@
 <style>
-	    /* 注文完了メッセージ */
-.complete-message {
-    max-width: 600px;
-    margin: 80px auto;
-    background: white;
-    border-radius: 15px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-    padding: 40px 30px;
-    text-align: center;
-    animation: fadeInUp 0.8s ease-out;
-}
-
-/* 見出し */
-.complete-message h1 {
-    font-size: 30px;
-    font-weight: 700;
-    color: #2d3748;
-    margin-bottom: 20px;
-    position: relative;
-    padding-bottom: 15px;
-}
-
-.complete-message h1::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80px;
-    height: 3px;
-    background: linear-gradient(90deg, #667eea, #764ba2);
-    border-radius: 2px;
-}
-
-/* サブメッセージ */
-.complete-message p {
-    font-size: 18px;
-    color: #4a5568;
-    line-height: 1.6;
-    margin-top: 15px;
-}
-
-/* ✅アイコンを追加 */
-.complete-message::before {
-    content: "🎉";
-    display: block;
-    font-size: 40px;
-    margin-bottom: 20px;
-    animation: bounce 1.2s infinite;
-}
-
-/* アニメーション */
-@keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
-}
-
-/* スマホ対応 */
-@media (max-width: 768px) {
+    /* 注文完了メッセージ */
     .complete-message {
-        margin: 40px auto;
-        padding: 25px 20px;
+        max-width: 600px;
+        margin: 80px auto;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        padding: 40px 30px;
+        text-align: center;
+        animation: fadeInUp 0.8s ease-out;
     }
-    .complete-message h1 {
-        font-size: 24px;
-    }
-    .complete-message p {
-        font-size: 16px;
-    }
-}
 
-    </style>
+    /* 見出し */
+    .complete-message h1 {
+        font-size: 30px;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 30px;
+        position: relative;
+        padding-bottom: 15px;
+    }
+
+    .complete-message h1::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 3px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        border-radius: 2px;
+    }
+
+    /* 予約番号専用ボックス - メインの改善点 */
+    .reservation-box {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 25px 30px;
+        border-radius: 12px;
+        margin: 25px 0;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        position: relative;
+        overflow: hidden;
+        animation: pulse-subtle 2s ease-in-out infinite;
+    }
+
+    .reservation-box::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+        transform: rotate(45deg);
+        animation: shine 3s ease-in-out infinite;
+    }
+
+    .reservation-label {
+        font-size: 14px;
+        font-weight: 500;
+        opacity: 0.9;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .reservation-number {
+        font-size: 28px;
+        font-weight: 800;
+        font-family: 'Courier New', monospace;
+        letter-spacing: 2px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        position: relative;
+        z-index: 2;
+    }
+
+    .reservation-copy-btn {
+        background: rgba(255,255,255,0.2);
+        border: 1px solid rgba(255,255,255,0.3);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 12px;
+        margin-top: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+
+    .reservation-copy-btn:hover {
+        background: rgba(255,255,255,0.3);
+        transform: translateY(-1px);
+    }
+
+    /* サブメッセージ */
+    .complete-message p {
+        font-size: 18px;
+        color: #4a5568;
+        line-height: 1.6;
+        margin: 15px 0;
+    }
+
+    /* 🎉アイコンを追加 */
+    .complete-message::before {
+        content: "🎉";
+        display: block;
+        font-size: 40px;
+        margin-bottom: 20px;
+        animation: bounce 1.2s infinite;
+    }
+
+    /* アニメーション */
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+    }
+
+    @keyframes pulse-subtle {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+    }
+
+    @keyframes shine {
+        0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+        100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+
+    @keyframes fadeInUp {
+        0% { 
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        100% { 
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* 注文に戻るボタンのスタイル改善 */
+    .back-button {
+        display: inline-block;
+        padding: 12px 24px;
+        background-color: #667eea;
+        color: white;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+        margin-top: 25px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .back-button:hover {
+        background-color: #5a6fd8;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    /* スマホ対応 */
+    @media (max-width: 768px) {
+        .complete-message {
+            margin: 40px auto;
+            padding: 25px 20px;
+        }
+        .complete-message h1 {
+            font-size: 24px;
+        }
+        .complete-message p {
+            font-size: 16px;
+        }
+        .reservation-box {
+            padding: 20px 15px;
+        }
+        .reservation-number {
+            font-size: 24px;
+            letter-spacing: 1px;
+        }
+    }
+</style>
 
 <div class="complete-message">
     <h1>ご注文ありがとうございました</h1>
+    
+    <!-- 改善された予約番号ボックス -->
+    <div class="reservation-box">
+        <div class="reservation-label">ご予約番号</div>
+        <div class="reservation-number" th:text="${reservationNumber}">RES-2024-001234</div>
+        <button class="reservation-copy-btn" onclick="copyReservationNumber()">
+            📋 番号をコピー
+        </button>
+    </div>
+    
     <p th:text="${message}">注文完了のメッセージ</p>
-   
+	<h4>※ご指定の受け取り日時にお越しいただけない場合は、電話またはメールにてご連絡させていただきます。</h4>
+    <!-- 注文に戻るボタン -->
+    <div style="margin-top: 30px;">
+        <a th:href="@{/receivetime}" class="back-button">注文に戻る</a>
+    </div>
 </div>
+
+<script>
+function copyReservationNumber() {
+    const reservationNumber = document.querySelector('.reservation-number').textContent;
+    navigator.clipboard.writeText(reservationNumber).then(function() {
+        const btn = document.querySelector('.reservation-copy-btn');
+        const originalText = btn.textContent;
+        btn.textContent = '✅ コピーしました！';
+        setTimeout(() => {
+            btn.textContent = originalText;
+        }, 2000);
+    });
+}
+</script>
